@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+message NodeId {
+	string name = 1;
+	string ip = 2;
+	int32 port = 3;
+}
+
+message ReadRequestFromCoordinator {
+	int32 key = 1;
+	string coordinatorName = 2;
+	string timeStamp = 3;
+}
+
+message WriteRequestFromCoordinator {
+	int32 key = 1;
+	string value = 2;
+	string coordinatorName = 3;
+	bool isReadRepair = 4;
+	string timeStamp = 5;
+}
+
+message KeyValuePair {
+	uint32 key = 1;
+	string value = 2;
+	string timeStamp = 3;
+}
+
+enum ConsistencyLevel {
+	ONE = 0;
+	QUORUM = 1;
+}
+
+enum RequestType {
+	READ = 0;
+	WRITE = 1;
+}
+
+//When issuing a request, put or get, the client explicitly specifies the desired consistency level: ONE or QUORUM.
+message ReadRequestFromClient {
+	int32 key = 1;
+	ConsistencyLevel consistencyLevel = 2;
+}
+
+//When issuing a request, put or get, the client explicitly specifies the desired consistency level: ONE or QUORUM.
+message WriteRequestFromClient {
+	int32 key = 1;
+	string value = 2;
+	ConsistencyLevel consistencyLevel = 3;
+}
+
+//message ConsistencyLevel {
+//	int32 one = 1;
+//	int32 quorum = 2;
+//}
+
+//message RequestType {
+//	string read = 1;
+//	string write = 2;
+//}
+message ResponseToCoordinator {
+	string coordinatorTimeStamp = 1;
+	int32 key = 2;
+	string value = 3;
+	string replicaName = 4;
+	RequestType requestType = 5;
+	string replicaTimeStamp = 6;
+	string message = 7;
+}
+
+message ResponseToClient {
+	int32 key = 1;
+	string value = 2;
+	string message = 3;
+}
+
+
+message DownReplica {
+	string coordinatorTimeStamp = 1;
+	int32 key = 2;
+	string value = 3;
+	string replicaName = 4;
+	RequestType requestType = 5;
+	string replicaTimeStamp = 6;
+	string message = 7;
+	bool isReplicaDown = 8;
+
+}
+
+message CoordinatorMessage {
+	oneof coordinator_message {
+		NodeId node_id = 1;
+		ReadRequestFromCoordinator read_request_from_coordinator = 2;
+		WriteRequestFromCoordinator write_request_from_coordinator = 3;
+		ReadRequestFromClient read_request_from_client = 4;
+		WriteRequestFromClient write_request_from_client = 5;
+		//		ConsistencyLevel consistency_level = 6;
+		//		RequestType request_type = 7;
+		ResponseToCoordinator response_to_coordinator = 6;
+		ResponseToClient response_to_client = 7;
+		DownReplica down_replica = 8;
+	}
+}
